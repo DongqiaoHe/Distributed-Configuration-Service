@@ -20,7 +20,6 @@ public class NettyClient {
     public static void main(String[] args) {
         NioEventLoopGroup group = new NioEventLoopGroup();
         Node node = new Node();
-
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.channel(NioSocketChannel.class);
