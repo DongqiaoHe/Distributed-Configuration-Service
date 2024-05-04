@@ -89,7 +89,6 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
         channelService.getChannelGroup().remove(ctx.channel());
         channelService.closeChannel(ctx.channel());
         System.out.println("Disconnected Node ID= "+ctx.channel().id().asShortText());
-        channelService.getChannelGroup().writeAndFlush(new DataMessage(ctx.channel().id().asShortText(), " is removed"));
         if(channelService.getLeaderId().equals(ctx.channel().id().asShortText())){
             //leader is disconnected
             System.out.println("Leader ID: "+ctx.channel().id().asShortText() + " is discounted! ");
