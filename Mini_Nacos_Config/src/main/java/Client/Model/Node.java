@@ -1,14 +1,61 @@
 package Client.Model;
 
-import java.util.UUID;
+
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
+
+import static Const.MessageConst.*;
 
 public class Node {
 
-    String uid;
 
-    String leaderId;
+    private String uid;
+
+    private String leaderId;
+
+    private ConcurrentHashMap<String, DataEntry> dataset;
+
 
     public Node() {
+        dataset = new ConcurrentHashMap<>();
+    }
+
+    public ConcurrentHashMap<String, DataEntry> getDataset() {
+        return dataset;
+    }
+
+    public DataEntry getDataEntry(String key) {
+        return dataset.get(key);
+    }
+
+    public void addData(String key, DataEntry dataEntry) {
+        dataset.put(key, dataEntry);
+    }
+
+    public void commitData(String key) {
+        dataset.get(key).setState(COMMITTED);
+    }
+
+    public void setDataset(ConcurrentHashMap<String, DataEntry> dataset) {
+        this.dataset = dataset;
+    }
+
+    public void addAck(String key) {
+        dataset.get(key).addAck();
+    }
+
+
+    public void removeData(String key) {
+        DataEntry res = dataset.remove(key);
+        if (res != null) {
+            System.out.println("Data key: " + key + " || value:" + res.getValue() + " is removed!");
+        }
+    }
+
+
+
+    public int getDataAck(String key) {
+        return dataset.get(key).getAck();
     }
 
     public String getUid() {

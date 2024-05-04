@@ -1,40 +1,63 @@
 package Server.Handler;
 
-import Message.ElectionMessage;
-import Message.DataMessage;
-import Message.PingMessage;
-import Message.Message;
+import Message.*;
 import Server.ChannelService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
-import io.netty.channel.group.ChannelGroup;
-import io.netty.channel.group.DefaultChannelGroup;
-import io.netty.util.concurrent.GlobalEventExecutor;
+import java.util.HashSet;
 
-import java.time.LocalDateTime;
+import static Const.MessageConst.UNCOMMITTED;
 
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message> {
 
     //Netty提供的组件，按照<ChannelID,Channel>的格式缓存连接
-    private static ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
 
-    private static ChannelService channelService = new ChannelService();
+    private static ChannelService channelService = ChannelService.getChannelService();
+
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
-        //System.out.println("服务器收到消息："+msg.getMessage());
-        //String strResp = "服务器时间" + LocalDateTime.now() + ",客户端"+ctx.channel().id()+"，发送消息：" + msg.getMessage();
-//        final TextWebSocketFrame response = new TextWebSocketFrame(strResp);
-//        ctx.channel().writeAndFlush(response);
-//        channelGroup.writeAndFlush(response);
-//        channelService.broadCast(strResp);
+        if(msg instanceof PingMessage && ((PingMessage) msg).getLeaderId().equals(ctx.channel().id().asShortText())){
+            //心跳机制
+            System.out.println("Ping from "+ctx.channel().id().asShortText());
+        }
+
+        if(msg instanceof IncrementalDataMessage){
+            //leader收到消息之后，给全部的followers发送ack。
+            IncrementalDataMessage incrementalDataMessage = (IncrementalDataMessage) msg;
+            if(incrementalDataMessage.getState() == UNCOMMITTED){
+                channelService.getChannelGroup().forEach(channel -> {
+                    channel.writeAndFlush(incrementalDataMessage);
+                });
+            }
+        }
+
+        if(msg instanceof AckDataMessage){
+            AckDataMessage ackDataMessage = (AckDataMessage) msg;
+            ackDataMessage.setChannelNum(channelService.getChannelGroup().size());
+            //收到ack之后，给leader发送ack。
+            channelService.getLeaderChannel().writeAndFlush(msg);
+        }
+
+        if(msg instanceof CommitDataMessage){
+
+            //收到ack之后，给leader发送ack。
+            channelService.getChannelGroup().writeAndFlush(msg);
+        }
+
+        if(msg instanceof FullDataMessage){
+            FullDataMessage fullDataMessage = (FullDataMessage) msg;
+            channelService.getChannel(fullDataMessage.getReceivedId()).writeAndFlush(new FullDataMessage(fullDataMessage.getReceivedId(), fullDataMessage.getDataset()));
+        }
+
+        if(msg instanceof RemoveDataMessage){
+            RemoveDataMessage removeDataMessage = (RemoveDataMessage) msg;
+            channelService.getChannelGroup().writeAndFlush(removeDataMessage);
+        }
     }
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        System.out.println("发生异常："+cause.getMessage());
-        channelService.closeChannel(ctx.channel());
-        channelGroup.remove(ctx.channel());
-        ctx.close();
+        cause.printStackTrace();
     }
 
     @Override
@@ -42,7 +65,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
         String leaderMessage = "";
         String leaderId = "";
         String nodeMessage = "";
-        channelGroup.add(ctx.channel());
+        channelService.getChannelGroup().add(ctx.channel());
         channelService.addChannel(ctx.channel());
         nodeMessage = "Your ID= "+ctx.channel().id().asShortText();
         ctx.channel().writeAndFlush(new DataMessage(ctx.channel().id().asShortText(), nodeMessage));
@@ -52,46 +75,30 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
             leaderMessage = "New Leader ID: " + leaderId;
             System.out.println("New Leader ID: "+leaderId);
             channelService.setLeaderId(leaderId);
-            channelGroup.writeAndFlush(new ElectionMessage(leaderId, leaderMessage));
+            channelService.getChannelGroup().writeAndFlush(new ElectionMessage(leaderId, leaderMessage));
         }else{
             leaderId = channelService.getLeaderId();
             leaderMessage = "Current Leader ID: "+ channelService.getLeaderId();
             ctx.channel().writeAndFlush(new ElectionMessage(leaderId, leaderMessage));
+            channelService.getLeaderChannel().writeAndFlush(new AddNodeMessage(ctx.channel().id().asShortText()));
         }
-
-
-        new Thread(()->{
-            while(true){
-                try {
-                    Thread.sleep(5000);
-                    if(ctx.channel().id().asShortText().equals(channelService.getLeaderId())){
-                        channelGroup.iterator().forEachRemaining(channel -> {
-                            if(!channel.id().asShortText().equals(channelService.getLeaderId())){
-                                channel.writeAndFlush(new PingMessage(channelService.getLeaderId()));
-                            }
-                        });
-                    }
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
     }
 
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
-        channelGroup.remove(ctx.channel());
+        channelService.getChannelGroup().remove(ctx.channel());
         channelService.closeChannel(ctx.channel());
-        System.out.println("断开连接：ID= "+ctx.channel().id().asShortText());
-
+        System.out.println("Disconnected Node ID= "+ctx.channel().id().asShortText());
+        channelService.getChannelGroup().writeAndFlush(new DataMessage(ctx.channel().id().asShortText(), " is removed"));
         if(channelService.getLeaderId().equals(ctx.channel().id().asShortText())){
+            //leader is disconnected
             System.out.println("Leader ID: "+ctx.channel().id().asShortText() + " is discounted! ");
-            String newLeaderId = channelService.allocateLeader();
-            channelService.setLeaderId(newLeaderId);
-            if(!newLeaderId.equals("")){
-                System.out.println("New Leader ID: "+newLeaderId);
-                channelGroup.writeAndFlush(new ElectionMessage(newLeaderId, "New Leader ID: " + newLeaderId));
-            }
+            channelService.setLeaderId(null);
+
+            //election new leader
+            CandidateOptionsMessage candidateOptionsMessage = new CandidateOptionsMessage();
+            candidateOptionsMessage.setIds(new HashSet<>(channelService.getAllChannel().keySet()));
+            channelService.getChannelGroup().writeAndFlush(candidateOptionsMessage);
         }
     }
 }

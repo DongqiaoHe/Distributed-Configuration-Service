@@ -1,6 +1,5 @@
 package Message;
 import lombok.Data;
-import lombok.Getter;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -30,6 +29,20 @@ public abstract class Message implements Serializable {
 
     public static final int PingMessage = 2;
 
+    public static final int CandidateOptionsMessage = 3;
+
+    public static final int IncrementalDataMessage = 4;
+
+    public static final int AckDataMessage = 5;
+
+    public static final int CommitDataMessage = 6;
+
+    public static final int AddNodeMessage = 7;
+
+    public static final int FullDataMessage = 8;
+
+    public static final int RemoveDataMessage = 9;
+
     /**
      * 请求类型 byte 值
      */
@@ -45,6 +58,13 @@ public abstract class Message implements Serializable {
         messageClasses.put(ElectionMessage, ElectionMessage.class);
         messageClasses.put(DataMessage, DataMessage.class);
         messageClasses.put(PingMessage, PingMessage.class);
+        messageClasses.put(CandidateOptionsMessage, CandidateOptionsMessage.class);
+        messageClasses.put(IncrementalDataMessage, IncrementalDataMessage.class);
+        messageClasses.put(AckDataMessage, AckDataMessage.class);
+        messageClasses.put(CommitDataMessage, CommitDataMessage.class);
+        messageClasses.put(AddNodeMessage, AddNodeMessage.class);
+        messageClasses.put(FullDataMessage, FullDataMessage.class);
+        messageClasses.put(RemoveDataMessage, RemoveDataMessage.class);
     }
 
     public int getSequenceId() {

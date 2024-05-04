@@ -1,16 +1,38 @@
 package Server;
 
 import io.netty.channel.Channel;
+import io.netty.channel.group.ChannelGroup;
+import io.netty.channel.group.DefaultChannelGroup;
 import io.netty.handler.codec.http.websocketx.TextWebSocketFrame;
+import io.netty.util.concurrent.GlobalEventExecutor;
 import lombok.Getter;
 
+import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ChannelService {
 
     private ConcurrentHashMap<String, Channel> allChannel = new ConcurrentHashMap<>();
 
+    private static ChannelService channelService = new ChannelService();
+
+    private ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
+
+    private ChannelService(){}
+
+    public static ChannelService getChannelService(){
+        return channelService;
+    }
+
     private String leaderId = "";
+
+    public ConcurrentHashMap<String, Channel> getAllChannel() {
+        return allChannel;
+    }
+
+    public ChannelGroup getChannelGroup() {
+        return channelGroup;
+    }
 
     public Boolean addChannel(Channel channel){
         Boolean added = false;
@@ -21,12 +43,6 @@ public class ChannelService {
         }
         return added;
 
-    }
-
-    public void broadCast(String message){
-        for (Channel channel : allChannel.values()) {
-            channel.writeAndFlush(new TextWebSocketFrame(message));
-        }
     }
 
     public Boolean closeChannel(Channel channel){
@@ -46,14 +62,11 @@ public class ChannelService {
         return leaderId;
     }
 
-    public String allocateLeader() {
-        String leaderId = "";
-        for (String id : allChannel.keySet()) {
-            if (id.compareTo(leaderId) != 0) {
-                leaderId = id;
-            }
+    public Channel getLeaderChannel(){
+        return allChannel.get(leaderId);
+    }
 
-        }
-        return leaderId;
+    public Channel getChannel(String id){
+        return allChannel.get(id);
     }
 }
