@@ -6,6 +6,7 @@ import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMessage> {
 
@@ -20,7 +21,7 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
      */
     private static ChannelService channelService = ChannelService.getChannelService();
 
-    static int votes = 0;
+    static AtomicInteger votes = new AtomicInteger(0);
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ElectionMessage msg) throws Exception {
@@ -31,8 +32,8 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
         }else{
             electionCount.put(leaderId, 1);
         }
-        votes++;
-        if(votes == channelService.getAllChannel().size()){
+        votes.addAndGet(1);
+        if(votes.get() == channelService.getAllChannel().size()){
             int maxVotes = 0;
             String newLeader = "";
             for(String key : electionCount.keySet()){
@@ -45,7 +46,7 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
             System.out.println("New Leader: "+newLeader);
             channelService.getChannelGroup().writeAndFlush(new ElectionMessage(newLeader, "New Leader: "+newLeader));
             electionCount.clear();
-            votes = 0;
+            votes = new AtomicInteger(0);
         }
     }
 
