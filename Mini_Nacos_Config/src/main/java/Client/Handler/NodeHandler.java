@@ -12,6 +12,10 @@ import java.util.Scanner;
 
 import static Const.MessageConst.UNCOMMITTED;
 
+/**
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class NodeHandler extends SimpleChannelInboundHandler<Message> {
 
     Node node;
@@ -22,12 +26,19 @@ public class NodeHandler extends SimpleChannelInboundHandler<Message> {
 
     Thread inputThread;
 
-
+    /**
+     * @param node
+     */
     public NodeHandler(Node node) {
         this.node = node;
 
     }
 
+    /**
+     * @param ctx channel handler context
+     * @param msg message
+     * @throws Exception
+     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
         if (msg instanceof DataMessage) {
@@ -68,8 +79,6 @@ public class NodeHandler extends SimpleChannelInboundHandler<Message> {
                 System.out.println("You am not the leader!");
             }
 
-            // 在连接建立后触发 active 事件
-            // 负责接收用户在控制台的输入，负责向服务器发送各种消息
             if (inputThread != null && inputThread.isAlive()) {
                 inputThread.interrupt();
             }

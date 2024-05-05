@@ -2,6 +2,10 @@ package Client.Model;
 
 import static Const.MessageConst.UNCOMMITTED;
 
+/**
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class DataEntry {
     String key;
 

@@ -26,7 +26,7 @@ public interface Serializer {
                     ObjectInputStream ois = new ObjectInputStream(new ByteArrayInputStream(bytes));
                     return (T) ois.readObject();
                 } catch (IOException | ClassNotFoundException e) {
-                    throw new RuntimeException("反序列化失败", e);
+                    throw new RuntimeException("Deserialization failure", e);
                 }
             }
 
@@ -38,7 +38,7 @@ public interface Serializer {
                     oos.writeObject(object);
                     return bos.toByteArray();
                 } catch (IOException e) {
-                    throw new RuntimeException("序列化失败", e);
+                    throw new RuntimeException("Serialization failure", e);
                 }
             }
         },

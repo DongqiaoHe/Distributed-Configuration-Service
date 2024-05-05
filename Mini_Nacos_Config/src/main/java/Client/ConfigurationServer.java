@@ -13,10 +13,11 @@ import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.timeout.IdleState;
 import io.netty.handler.timeout.IdleStateEvent;
 import io.netty.handler.timeout.IdleStateHandler;
-import lombok.extern.slf4j.Slf4j;
 
-
-@Slf4j
+/**
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class ConfigurationServer {
     public static void main(String[] args) {
         NioEventLoopGroup group = new NioEventLoopGroup();

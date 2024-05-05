@@ -8,16 +8,26 @@ import java.util.HashSet;
 
 import static Const.MessageConst.UNCOMMITTED;
 
+/**
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message> {
 
-    //Netty提供的组件，按照<ChannelID,Channel>的格式缓存连接
-
+    /**
+     *  ChannelService to get channels
+     */
     private static ChannelService channelService = ChannelService.getChannelService();
 
+    /**
+     * @param ctx Channel Handler Context
+     * @param msg Message to be handled
+     * @throws Exception
+     */
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, Message msg) throws Exception {
         if(msg instanceof PingMessage && ((PingMessage) msg).getLeaderId().equals(ctx.channel().id().asShortText())){
-            //心跳机制
+            //handle ping message
             System.out.println("Ping from "+ctx.channel().id().asShortText());
         }
 
@@ -60,6 +70,11 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
         cause.printStackTrace();
     }
 
+    /**
+     * after handler added, add channel to channelGroup and set its initial information
+     * @param ctx Channel Handler Context
+     * @throws Exception
+     */
     @Override
     public void handlerAdded(ChannelHandlerContext ctx) throws Exception {
         String leaderMessage = "";
@@ -84,6 +99,11 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
         }
     }
 
+    /**
+     * after handler removed, remove channel from channelGroup
+     * @param ctx Channel Handler Context
+     * @throws Exception
+     */
     @Override
     public void handlerRemoved(ChannelHandlerContext ctx) throws Exception {
         channelService.getChannelGroup().remove(ctx.channel());

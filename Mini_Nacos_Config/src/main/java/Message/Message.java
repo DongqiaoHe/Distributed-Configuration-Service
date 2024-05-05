@@ -5,6 +5,10 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 @Data
 public abstract class Message implements Serializable {
 

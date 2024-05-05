@@ -2,6 +2,10 @@ package Message;
 
 import java.util.Map;
 
+/**
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class DataMessage extends Message{
 
 

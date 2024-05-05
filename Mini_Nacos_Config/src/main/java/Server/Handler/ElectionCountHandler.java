@@ -8,8 +8,16 @@ import io.netty.channel.SimpleChannelInboundHandler;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMessage> {
+
+    /**
+     * key: leaderId
+     * value: count
+     */
     ConcurrentHashMap<String, Integer> electionCount = new ConcurrentHashMap<>();
 
+    /**
+     *  ChannelService to get channels
+     */
     private static ChannelService channelService = ChannelService.getChannelService();
 
     static int votes = 0;

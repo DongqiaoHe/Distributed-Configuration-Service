@@ -20,7 +20,7 @@
 
 ---------------  S U M M A R Y ------------
 
-Command Line: -javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=56289:/Applications/IntelliJ IDEA.app/Contents/bin -agentpath:/private/var/folders/3r/95p1_dgx6652y4d6_z8qp72r0000gn/T/libasyncProfiler.dylib=start,jfr,event=wall,interval=10ms,jfrsync=profile,cstack=no,file=/Users/hedongqiao/IdeaSnapshots/NettyClient_2024_04_25_144329.jfr,log=/private/var/folders/3r/95p1_dgx6652y4d6_z8qp72r0000gn/T/NettyClient_2024_04_25_144329.jfr.log.txt,logLevel=DEBUG -Dfile.encoding=UTF-8 Client.NettyClient
+Command Line: -javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=56289:/Applications/IntelliJ IDEA.app/Contents/bin -agentpath:/private/var/folders/3r/95p1_dgx6652y4d6_z8qp72r0000gn/T/libasyncProfiler.dylib=start,jfr,event=wall,interval=10ms,jfrsync=profile,cstack=no,file=/Users/hedongqiao/IdeaSnapshots/NettyClient_2024_04_25_144329.jfr,log=/private/var/folders/3r/95p1_dgx6652y4d6_z8qp72r0000gn/T/NettyClient_2024_04_25_144329.jfr.log.txt,logLevel=DEBUG -Dfile.encoding=UTF-8 Client.ConfigurationServer
 
 Host: "MacBookPro18,1" arm64 1 MHz, 10 cores, 32G, Darwin 23.0.0, macOS 14.0 (23A344)
 Time: Thu Apr 25 14:43:30 2024 AEST elapsed time: 1.126350 seconds (0d 0h 0m 1s)
@@ -964,7 +964,7 @@ Dynamic libraries:
 
 VM Arguments:
 jvm_args: -javaagent:/Applications/IntelliJ IDEA.app/Contents/lib/idea_rt.jar=56289:/Applications/IntelliJ IDEA.app/Contents/bin -agentpath:/private/var/folders/3r/95p1_dgx6652y4d6_z8qp72r0000gn/T/libasyncProfiler.dylib=start,jfr,event=wall,interval=10ms,jfrsync=profile,cstack=no,file=/Users/hedongqiao/IdeaSnapshots/NettyClient_2024_04_25_144329.jfr,log=/private/var/folders/3r/95p1_dgx6652y4d6_z8qp72r0000gn/T/NettyClient_2024_04_25_144329.jfr.log.txt,logLevel=DEBUG -Dfile.encoding=UTF-8 
-java_command: Client.NettyClient
+java_command: Client.ConfigurationServer
 java_class_path (initial): /Users/hedongqiao/Desktop/DA/Code/Mini_Nacos_Config/target/classes:/Users/hedongqiao/.m2/repository/org/projectlombok/lombok/1.16.18/lombok-1.16.18.jar:/Users/hedongqiao/.m2/repository/io/netty/netty-all/4.1.68.Final/netty-all-4.1.68.Final.jar:/Users/hedongqiao/.m2/repository/com/google/code/gson/gson/2.8.5/gson-2.8.5.jar
 Launcher Type: SUN_STANDARD
 

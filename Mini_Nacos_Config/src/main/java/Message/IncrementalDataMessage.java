@@ -2,6 +2,11 @@ package Message;
 
 import static Const.MessageConst.UNCOMMITTED;
 
+/**
+ * Incremental Data Message
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class IncrementalDataMessage extends Message{
     String Key;
     String Value;

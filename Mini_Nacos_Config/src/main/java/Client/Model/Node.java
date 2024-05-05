@@ -2,10 +2,13 @@ package Client.Model;
 
 
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static Const.MessageConst.*;
 
+/**
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class Node {
 
 

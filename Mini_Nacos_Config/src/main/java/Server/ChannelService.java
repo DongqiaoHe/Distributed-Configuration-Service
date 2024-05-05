@@ -14,6 +14,7 @@ public class ChannelService {
 
     private ConcurrentHashMap<String, Channel> allChannel = new ConcurrentHashMap<>();
 
+
     private static ChannelService channelService = new ChannelService();
 
     private ChannelGroup channelGroup = new DefaultChannelGroup(GlobalEventExecutor.INSTANCE);
@@ -34,6 +35,11 @@ public class ChannelService {
         return channelGroup;
     }
 
+    /**
+     * add channel to allChannel
+     * @param channel
+     * @return {@link Boolean }
+     */
     public Boolean addChannel(Channel channel){
         Boolean added = false;
         String channelId = channel.id().asShortText();
@@ -45,6 +51,11 @@ public class ChannelService {
 
     }
 
+    /**
+     * delete channel from allChannel
+     * @param channel
+     * @return {@link Boolean }
+     */
     public Boolean closeChannel(Channel channel){
         String channelId = channel.id().asShortText();
         Channel c = allChannel.remove(channelId);
@@ -54,18 +65,36 @@ public class ChannelService {
         return false;
     }
 
+    /**
+     * set leader id
+     * @param leaderId
+     */
     public void setLeaderId(String leaderId) {
         this.leaderId = leaderId;
     }
 
+    /**
+     * get leader id
+     * @return {@link String }
+     */
     public String getLeaderId() {
         return leaderId;
     }
 
+    /**
+     * return leader channel
+     * @return {@link Channel }
+     */
     public Channel getLeaderChannel(){
         return allChannel.get(leaderId);
     }
 
+    /**
+     * return according to the channel short id
+     *
+     * @param id channel id
+     * @return {@link Channel }
+     */
     public Channel getChannel(String id){
         return allChannel.get(id);
     }

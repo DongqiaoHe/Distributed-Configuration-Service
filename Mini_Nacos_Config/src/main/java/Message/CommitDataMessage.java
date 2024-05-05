@@ -1,5 +1,10 @@
 package Message;
 
+/**
+ * Message that contains the key to commit the data in the dataset
+ * @author hedongqiao
+ * @date 2024/05/05
+ */
 public class CommitDataMessage extends Message{
     String Key;
 
