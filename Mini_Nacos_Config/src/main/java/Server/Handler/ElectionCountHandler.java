@@ -15,12 +15,12 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
      * key: leaderId
      * value: count
      */
-    ConcurrentHashMap<String, Integer> electionCount = new ConcurrentHashMap<>();
+    static ConcurrentHashMap<String, Integer> electionCount = new ConcurrentHashMap<>();
 
     /**
      *  ChannelService to get channels
      */
-    private static ChannelService channelService = ChannelService.getChannelService();
+    static private ChannelService channelService = ChannelService.getChannelService();
 
     static volatile int votes =  0;
 
@@ -34,6 +34,7 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
             electionCount.put(leaderId, 1);
         }
         votes++;
+        System.out.println(votes + " votes received");
         if(votes == channelService.getAllChannel().size()){
             int maxVotes = 0;
             String newLeader = "";
