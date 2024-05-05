@@ -22,7 +22,7 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
      */
     private static ChannelService channelService = ChannelService.getChannelService();
 
-    static AtomicInteger votes = new AtomicInteger(0);
+    static volatile int votes =  0;
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ElectionMessage msg) throws Exception {
@@ -33,25 +33,22 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
         }else{
             electionCount.put(leaderId, 1);
         }
-        votes.addAndGet(1);
-        synchronized(votes){
-            if(votes.get() == channelService.getAllChannel().size()){
-                int maxVotes = 0;
-                String newLeader = "";
-                for(String key : electionCount.keySet()){
-                    if(electionCount.get(key) > maxVotes){
-                        maxVotes = electionCount.get(key);
-                        newLeader = key;
-                    }
+        votes++;
+        if(votes == channelService.getAllChannel().size()){
+            int maxVotes = 0;
+            String newLeader = "";
+            for(String key : electionCount.keySet()){
+                if(electionCount.get(key) > maxVotes){
+                    maxVotes = electionCount.get(key);
+                    newLeader = key;
                 }
-                channelService.setLeaderId(newLeader);
-                System.out.println("New Leader: "+newLeader);
-                channelService.getChannelGroup().writeAndFlush(new ElectionMessage(newLeader, "New Leader: "+newLeader));
-                electionCount.clear();
-                votes = new AtomicInteger(0);
             }
+            channelService.setLeaderId(newLeader);
+            System.out.println("New Leader: "+newLeader);
+            channelService.getChannelGroup().writeAndFlush(new ElectionMessage(newLeader, "New Leader: "+newLeader));
+            electionCount.clear();
+            votes = 0;
         }
-
     }
 
 }
