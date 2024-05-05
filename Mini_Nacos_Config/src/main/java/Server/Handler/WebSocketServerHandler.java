@@ -85,7 +85,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
         nodeMessage = "Your ID= "+ctx.channel().id().asShortText();
         ctx.channel().writeAndFlush(new DataMessage(ctx.channel().id().asShortText(), nodeMessage));
         System.out.println("Node connected：ID= "+ctx.channel().id().asShortText());
-        if(channelService.getLeaderId().equals("")){
+        if("".equals(channelService.getLeaderId()) || channelService.getLeaderId() == null){
             leaderId = ctx.channel().id().asShortText();
             leaderMessage = "New Leader ID: " + leaderId;
             System.out.println("New Leader ID: "+leaderId);
@@ -109,7 +109,9 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
         channelService.getChannelGroup().remove(ctx.channel());
         channelService.closeChannel(ctx.channel());
         System.out.println("Disconnected Node ID= "+ctx.channel().id().asShortText());
-        if(channelService.getLeaderId().equals(ctx.channel().id().asShortText())){
+        if(channelService.getLeaderId() == null){
+            System.out.println("No leader now!");
+        }else if(channelService.getLeaderId().equals(ctx.channel().id().asShortText())){
             //leader is disconnected
             System.out.println("Leader ID: "+ctx.channel().id().asShortText() + " is discounted! ");
             channelService.setLeaderId(null);
@@ -118,6 +120,7 @@ public class WebSocketServerHandler extends SimpleChannelInboundHandler<Message>
             CandidateOptionsMessage candidateOptionsMessage = new CandidateOptionsMessage();
             candidateOptionsMessage.setIds(new HashSet<>(channelService.getAllChannel().keySet()));
             channelService.getChannelGroup().writeAndFlush(candidateOptionsMessage);
+            channelService.setLeaderId(null);
         }
     }
 }

@@ -33,9 +33,11 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
         }else{
             electionCount.put(leaderId, 1);
         }
-        votes++;
-        System.out.println(votes + " votes received");
-        if(votes == channelService.getAllChannel().size()){
+        synchronized (this){
+            votes++;
+            System.out.println(votes + " votes received");
+        }
+         if(votes == channelService.getAllChannel().size()){
             int maxVotes = 0;
             String newLeader = "";
             for(String key : electionCount.keySet()){
