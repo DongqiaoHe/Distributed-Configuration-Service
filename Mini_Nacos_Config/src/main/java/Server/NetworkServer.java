@@ -39,13 +39,18 @@ public class NetworkServer {
                     ch.pipeline().addLast(new ChannelDuplexHandler() {
                         // 用来触发特殊事件
                         @Override
-                        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) throws Exception{
+                        public void userEventTriggered(ChannelHandlerContext ctx, Object evt) {
                             IdleStateEvent event = (IdleStateEvent) evt;
                             // 触发了读空闲事件
                             if (event.state() == IdleState.READER_IDLE) {
                                 System.out.println("Missed HeartBeat for 10 second, close connection" + ctx.channel().id().asShortText());
                                 ctx.channel().close();
                             }
+                        }
+
+                        @Override
+                        public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
+                            System.out.println("Error: " + cause.getMessage());
                         }
                     });
                     ch.pipeline().addLast(new WebSocketServerHandler());
