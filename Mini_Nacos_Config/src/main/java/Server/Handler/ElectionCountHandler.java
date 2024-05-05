@@ -4,6 +4,7 @@ import Message.ElectionMessage;
 import Server.ChannelService;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.Synchronized;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -33,21 +34,24 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
             electionCount.put(leaderId, 1);
         }
         votes.addAndGet(1);
-        if(votes.get() == channelService.getAllChannel().size()){
-            int maxVotes = 0;
-            String newLeader = "";
-            for(String key : electionCount.keySet()){
-                if(electionCount.get(key) > maxVotes){
-                    maxVotes = electionCount.get(key);
-                    newLeader = key;
+        synchronized(votes){
+            if(votes.get() == channelService.getAllChannel().size()){
+                int maxVotes = 0;
+                String newLeader = "";
+                for(String key : electionCount.keySet()){
+                    if(electionCount.get(key) > maxVotes){
+                        maxVotes = electionCount.get(key);
+                        newLeader = key;
+                    }
                 }
+                channelService.setLeaderId(newLeader);
+                System.out.println("New Leader: "+newLeader);
+                channelService.getChannelGroup().writeAndFlush(new ElectionMessage(newLeader, "New Leader: "+newLeader));
+                electionCount.clear();
+                votes = new AtomicInteger(0);
             }
-            channelService.setLeaderId(newLeader);
-            System.out.println("New Leader: "+newLeader);
-            channelService.getChannelGroup().writeAndFlush(new ElectionMessage(newLeader, "New Leader: "+newLeader));
-            electionCount.clear();
-            votes = new AtomicInteger(0);
         }
+
     }
 
 }
