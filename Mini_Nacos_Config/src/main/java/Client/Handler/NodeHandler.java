@@ -181,6 +181,9 @@ public class NodeHandler extends SimpleChannelInboundHandler<Message> {
                     System.out.println("More than half followers have acked.");
                     ctx.writeAndFlush(new CommitDataMessage(ackDataMessage.getKey()));
                 }
+                if(commits.contains(key) && node.getDataAck(key) == ackDataMessage.getChannelNum()){
+                    commits.remove(key);
+                }
             }
         }
 
