@@ -65,7 +65,7 @@ public class NodeHandler extends SimpleChannelInboundHandler<Message> {
             }
             System.out.println(sb);
             System.out.println("Selected candidate: " + selectedId);
-            ctx.writeAndFlush(new ElectionMessage(selectedId, "It has the biggest ID."));
+            ctx.writeAndFlush(new ElectionMessage(selectedId, ""));
         }
 
         if (msg instanceof ElectionMessage) {

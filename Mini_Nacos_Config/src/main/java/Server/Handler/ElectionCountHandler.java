@@ -27,7 +27,7 @@ public class ElectionCountHandler extends SimpleChannelInboundHandler<ElectionMe
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, ElectionMessage msg) throws Exception {
         String leaderId = msg.getLeaderId();
-        System.out.println("Received vote for: "+leaderId + " from "+ctx.channel().id().asShortText() + " ,because: "+msg.getMessage());
+        System.out.println("Received vote for: "+leaderId + " from "+ctx.channel().id().asShortText());
         if(electionCount.containsKey(leaderId)){
             electionCount.put(leaderId, electionCount.get(leaderId)+1);
         }else{
